@@ -1,20 +1,17 @@
-# Import flask and datetime module for showing date and time
 from flask import Flask,jsonify, request
 import datetime
 import os
 import psycopg2
 import json
-from psycopg2.extras import RealDictCursor,DictCursor
+# from psycopg2.extras import RealDictCursor,DictCursor
 from datetime import date, datetime, timedelta, timezone
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
-# import bcrypt
 
 x = datetime.now()
 
 # Initializing flask app
 app = Flask(__name__)
-# jwt_secret = 
-# print('jwt_secret',jwt_secret)
+
 app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET_KEY')
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
@@ -64,32 +61,11 @@ def create_token():
     response = {"access_token":access_token}
     return response
 
-@app.route('/profile')
-def my_profile():
-    response_body = {
-        "name": "Nagato",
-        "about" :"Hello! I'm a full stack developer that loves python and javascript"
-    }
-
-    return response_body
-
 @app.route("/logout", methods=["POST"])
 def logout():
     response = jsonify({"msg": "logout successful"})
     unset_jwt_cookies(response)
     return response
-
-# Route for seeing a data
-# @app.route('/data', methods=['GET'])
-# def get_time():
-
-# 	# Returning an api for showing in reactjs
-# 	return {
-# 		'name':"geek",
-# 		"age":"22",
-# 		"date":x,
-# 		"programming":"python"
-# 		}
 
 @app.route('/tasks', methods=['GET'])
 @jwt_required()
@@ -235,36 +211,6 @@ def show_tasks():
     # return jsonify(pickup_rows)
     return jsonify(all_tasks)
 
-# @app.route('/updateitem', methods=['GET','POST','PUT'])
-# def update_item():
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-#     cur.execute("""select * from items where is_available=true order by id""")
-#     rows = cur.fetchall()
-#     columns = [desc[0] for desc in cur.description]
-#     all_items = [dict(zip(columns, row)) for row in rows]
-#     return jsonify(all_items)
-
-
-# @app.route('/updateitem/<id>', methods=['GET','POST','PUT'])
-# def update_item_location(id):
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-#     # try:
-#     update_sql = f"""update items set address_apt='512' where id={id}"""
-#     # except: foreign key error if updated address not already in addresses
-#     #     add_address_sql = """insert into addresses values (0,'',)"""
-#     # cur.execute(f"""select * from items where id={id}""")
-#     cur.execute(update_sql)
-#     conn.commit()
-#     cur.execute(f"""select * from items where id={id}""")
-#     row = cur.fetchone()
-#     item_updated = dict(zip([desc[0] for desc in cur.description], row))
-
-#     cur.close()
-#     # item = cur.fetchone()
-#     # print(item)
-#     return jsonify(item_updated)
 
 @app.route('/updateitem/<id>/<location>', methods=['GET','POST','PUT'])
 @jwt_required()
